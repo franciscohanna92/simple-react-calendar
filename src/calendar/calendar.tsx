@@ -1,4 +1,4 @@
-import React, { Component, Fragment, ReactElement } from 'react'
+import React, { Component, ComponentProps, Fragment, ReactElement } from 'react'
 import isSameMonth from 'date-fns/is_same_month'
 import isValidDate from 'date-fns/is_valid'
 import startOfMonth from 'date-fns/start_of_month'
@@ -10,21 +10,28 @@ import {
   PREV_MONTH_TITLE
 } from './consts'
 import {
+  GetISODate,
+  GetWeekDayFormatted,
   ICalendarRenderProp,
   IDate,
   IDateSelection,
   IDayOfWeekRenderProps,
-  IDayRenderProps,
   IDaysOfWeekRenderProps,
   IMonthHeaderRenderProps,
   IMonthRenderProps,
   INoticeType,
   ISelectionRange,
-  IWeekRenderProps
+  IWeekRenderProps,
+  RenderPropsWeekDay
 } from '../@types'
+import {
+  getISODate as helperGetISODate,
+  getWeekDayFormatted as helperGetWeekDayFormatted
+} from '../helper'
 import Month from './month'
 import MonthHeader from './month_header'
 import Notice from './notice'
+import WeekDay from '../RenderPropsComponents/WeekDay'
 
 const isValid = function(date: Date) {
   try {
@@ -69,7 +76,9 @@ export type Props = {
   onSelect?: (...args: any[]) => any
   onSelectionProgress?: (...args: any[]) => any
   rangeLimit?: number
-  renderDay?: IDayRenderProps
+  renderWeekDay?: RenderPropsWeekDay
+  getWeekDayFormatted?: GetWeekDayFormatted
+  getISODate?: GetISODate
   renderDayOfWeek?: IDayOfWeekRenderProps
   renderDaysOfWeek?: IDaysOfWeekRenderProps
   renderMonth?: IMonthRenderProps
@@ -93,9 +102,14 @@ export default class Calendar extends Component<Props, State> {
     blockClassName: BLOCK_CLASS_NAME,
     daysOfWeek: DAYS_OF_WEEK,
     disableDaysOfWeek: false,
+    getISODate: helperGetISODate,
+    getWeekDayFormatted: helperGetWeekDayFormatted,
     headerNextTitle: NEXT_MONTH_TITLE,
     headerPrevTitle: PREV_MONTH_TITLE,
     mode: 'single',
+    renderWeekDay: (props: ComponentProps<typeof WeekDay>) => (
+      <WeekDay {...props} />
+    ),
     weekStartsOn: 1
   }
 
@@ -264,11 +278,13 @@ export default class Calendar extends Component<Props, State> {
       rangeLimit,
       weekStartsOn,
       daysOfWeek,
-      renderDay,
+      renderWeekDay,
       renderWeek,
       renderMonth,
       renderDaysOfWeek,
-      renderDayOfWeek
+      renderDayOfWeek,
+      getWeekDayFormatted,
+      getISODate
     } = this.props
 
     const selection = this._selection()
@@ -278,13 +294,14 @@ export default class Calendar extends Component<Props, State> {
       // @ts-ignore: No overload matches this call
       <Month
         customRender={renderMonth}
-        renderDay={renderDay}
+        renderWeekDay={renderWeekDay}
         renderWeek={renderWeek}
         renderDaysOfWeek={renderDaysOfWeek}
         renderDayOfWeek={renderDayOfWeek}
         activeMonth={this._activeMonth()}
         blockClassName={blockClassName}
         daysOfWeek={daysOfWeek}
+        getWeekDayFormatted={getWeekDayFormatted}
         disableDaysOfWeek={disableDaysOfWeek}
         disabledIntervals={disabledIntervals}
         highlightedEnd={highlight.end}
@@ -301,6 +318,7 @@ export default class Calendar extends Component<Props, State> {
         selectedMin={selection.start}
         today={this._today()}
         weekStartsOn={weekStartsOn as number}
+        getISODate={getISODate}
       />
     )
   }

@@ -1,43 +1,45 @@
 import { fireEvent, render } from '@testing-library/react'
-import React from 'react'
+import React, { ComponentProps } from 'react'
 
-import Day, { Props } from '../day'
+import { getWeekDayFormatted } from '../../helper'
+import WeekDay from '.'
 
-const renderDay = (props: Partial<Props> = {}) => {
-  return render(
-    <Day
-      blockClassName='example-block-class'
-      date='2015-05-05'
-      handleOnClick={() => {}}
-      handleOnEnter={() => {}}
-      isCurrentMonth={false}
-      isDisabled={false}
-      isHighlighted={false}
-      isMonthNext={false}
-      isMonthPrev={false}
-      isNonSelectable={false}
-      isSelectable={false}
-      isSelected={false}
-      isSelectionEnd={false}
-      isSelectionStart={false}
-      isToday={false}
-      isWeekend={false}
-      isWorkday={false}
-      {...props}
-    />
-  )
+const renderWeekDay = (props: Partial<ComponentProps<typeof WeekDay>>) => {
+  const baseProps = {
+    ISODate: '2020-02-09',
+    blockClassName: 'example-class-name',
+    date: new Date(2020, 1, 9),
+    getWeekDayFormatted,
+    handleOnClick: jest.fn(),
+    handleOnEnter: jest.fn(),
+    isCurrentMonth: true,
+    isDisabled: false,
+    isHighlighted: true,
+    isMonthNext: false,
+    isMonthPrev: false,
+    isNonSelectable: true,
+    isSelectable: true,
+    isSelected: false,
+    isSelectionEnd: false,
+    isSelectionStart: true,
+    isToday: true,
+    isWeekend: true,
+    isWorkDay: false,
+    ...props
+  }
+
+  return render(<WeekDay {...baseProps} />)
 }
-// TODO: remove me
 
 test('default render', () => {
-  const { container } = renderDay()
+  const { container } = renderWeekDay({})
 
   expect(container.firstChild).toMatchSnapshot()
 })
 
 test('trigger callback on click', () => {
   const handleOnClick = jest.fn()
-  const { getByRole } = renderDay({ handleOnClick })
+  const { getByRole } = renderWeekDay({ handleOnClick })
 
   const button = getByRole('button')
 
@@ -48,7 +50,7 @@ test('trigger callback on click', () => {
 
 test('trigger callback on mouseenter', () => {
   const handleOnEnter = jest.fn()
-  const { getByRole } = renderDay({ handleOnEnter })
+  const { getByRole } = renderWeekDay({ handleOnEnter })
 
   const button = getByRole('button')
 
@@ -57,90 +59,80 @@ test('trigger callback on mouseenter', () => {
   expect(handleOnEnter).toBeCalled()
 })
 
-test('custom render', () => {
-  const customRender = () => {
-    return <button type='button'>Custom</button>
-  }
-
-  const { container } = renderDay({ customRender })
-
-  expect(container.firstChild).toMatchSnapshot()
-})
-
 test('handle currentMonth', () => {
-  const { container } = renderDay({ isCurrentMonth: true })
+  const { container } = renderWeekDay({ isCurrentMonth: true })
 
   expect(container.firstChild).toHaveClass('is-current_month')
 })
 
 test('handle isDisabled', () => {
-  const { container } = renderDay({ isDisabled: true })
+  const { container } = renderWeekDay({ isDisabled: true })
 
   expect(container.firstChild).toHaveClass('is-disabled')
 })
 
 test('handle isHighlighted', () => {
-  const { container } = renderDay({ isHighlighted: true })
+  const { container } = renderWeekDay({ isHighlighted: true })
 
   expect(container.firstChild).toHaveClass('is-highlighted')
 })
 
 test('handle isMonthNext', () => {
-  const { container } = renderDay({ isMonthNext: true })
+  const { container } = renderWeekDay({ isMonthNext: true })
 
   expect(container.firstChild).toHaveClass('is-next_month')
 })
 
 test('handle isMonthPrev', () => {
-  const { container } = renderDay({ isMonthPrev: true })
+  const { container } = renderWeekDay({ isMonthPrev: true })
 
   expect(container.firstChild).toHaveClass('is-prev_month')
 })
 
 test('handle isNonSelectable', () => {
-  const { container } = renderDay({ isNonSelectable: true })
+  const { container } = renderWeekDay({ isNonSelectable: true })
 
   expect(container.firstChild).toHaveClass('is-not_selectable')
 })
 
 test('handle isSelectable', () => {
-  const { container } = renderDay({ isSelectable: true })
+  const { container } = renderWeekDay({ isSelectable: true })
 
   expect(container.firstChild).toHaveClass('is-selectable')
 })
 
 test('handle isSelected', () => {
-  const { container } = renderDay({ isSelected: true })
+  const { container } = renderWeekDay({ isSelected: true })
 
   expect(container.firstChild).toHaveClass('is-selected')
 })
 
 test('handle isSelectionEnd', () => {
-  const { container } = renderDay({ isSelectionEnd: true })
+  const { container } = renderWeekDay({ isSelectionEnd: true })
 
   expect(container.firstChild).toHaveClass('is-end_selection')
 })
 
 test('handle isSelectionStart', () => {
-  const { container } = renderDay({ isSelectionStart: true })
+  const { container } = renderWeekDay({ isSelectionStart: true })
 
   expect(container.firstChild).toHaveClass('is-start_selection')
 })
 
 test('handle isToday', () => {
-  const { container } = renderDay({ isToday: true })
+  const { container } = renderWeekDay({ isToday: true })
 
   expect(container.firstChild).toHaveClass('is-today')
 })
 
 test('handle isWeekend', () => {
-  const { container } = renderDay({ isWeekend: true })
+  const { container } = renderWeekDay({ isWeekend: true })
 
   expect(container.firstChild).toHaveClass('is-weekend')
 })
 
 test('handle isWorkday', () => {
-  const { container } = renderDay({ isWorkday: true })
+  const { container } = renderWeekDay({ isWorkDay: true })
 
   expect(container.firstChild).toHaveClass('is-working_day')
 })

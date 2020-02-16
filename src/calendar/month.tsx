@@ -13,13 +13,15 @@ import startOfWeek from 'date-fns/start_of_week'
 import subDays from 'date-fns/sub_days'
 
 import {
+  GetISODate,
+  GetWeekDayFormatted,
   IDate,
   IDayOfWeekRenderProps,
-  IDayRenderProps,
   IDaysOfWeekRenderProps,
   IMonthRenderProps,
   INoticeType,
-  IWeekRenderProps
+  IWeekRenderProps,
+  RenderPropsWeekDay
 } from '../@types'
 import DaysOfWeek from './days_of_week'
 import Week from './week'
@@ -46,9 +48,11 @@ export type Props = {
   onDayMouseEnter?: (...args: any[]) => any
   onNoticeChange: (...args: any[]) => any
   rangeLimit?: number
-  renderDay?: IDayRenderProps
+  renderWeekDay: RenderPropsWeekDay
   renderDayOfWeek?: IDayOfWeekRenderProps
   renderDaysOfWeek?: IDaysOfWeekRenderProps
+  getWeekDayFormatted: GetWeekDayFormatted
+  getISODate: GetISODate
   renderWeek?: IWeekRenderProps
   selectedMax?: IDate
   selectedMin?: IDate
@@ -67,9 +71,11 @@ export default class Month extends Component<Props, {}> {
   handleOnDayMouseEnter = (event: SyntheticEvent<HTMLButtonElement>) => {
     event.preventDefault()
     const {
-      currentTarget: { value }
+      currentTarget: {
+        dataset: { simpleReactCalendarDay }
+      }
     } = event
-    const date = parse(value)
+    const date = parse(simpleReactCalendarDay as string)
 
     const { onDayMouseEnter } = this.props
 
@@ -116,10 +122,13 @@ export default class Month extends Component<Props, {}> {
 
   handleOnDayClick = (event: SyntheticEvent<HTMLButtonElement>) => {
     event.preventDefault()
+
     const {
-      currentTarget: { value }
+      currentTarget: {
+        dataset: { simpleReactCalendarDay }
+      }
     } = event
-    const date = parse(value)
+    const date = parse(simpleReactCalendarDay as string)
     const { mode } = this.props
 
     if (mode === RANGE_MODE) {
@@ -192,6 +201,7 @@ export default class Month extends Component<Props, {}> {
       //       this is passed from the parent component
       // @ts-ignore
       this._selectionStart = date
+
       // TODO: simplify with FC approach, remove state logic from child components
       //       this is passed from the parent component
       // @ts-ignore
@@ -353,8 +363,10 @@ export default class Month extends Component<Props, {}> {
       minNumberOfWeeks,
       rangeLimit,
       weekStartsOn,
-      renderDay,
-      renderWeek
+      renderWeekDay,
+      renderWeek,
+      getWeekDayFormatted,
+      getISODate
     } = this.props
     const weeks = []
     let { minDate, maxDate } = this.props
@@ -386,6 +398,7 @@ export default class Month extends Component<Props, {}> {
           activeMonth={activeMonth}
           blockClassName={blockClassName}
           customRender={renderWeek}
+          getWeekDayFormatted={getWeekDayFormatted}
           date={week}
           disabledIntervals={disabledIntervals}
           highlightedEnd={highlightedEnd}
@@ -396,11 +409,12 @@ export default class Month extends Component<Props, {}> {
           onDayClick={this.handleOnDayClick}
           onDayMouseEnter={this.handleOnDayMouseEnter}
           onDisabledDayClick={this.handleOnDisabledDayClick}
-          renderDay={renderDay}
+          renderWeekDay={renderWeekDay}
           selectedMax={selectedMax}
           selectedMin={selectedMin}
           today={today}
           weekStartsOn={weekStartsOn}
+          getISODate={getISODate}
         />
       )
     })
